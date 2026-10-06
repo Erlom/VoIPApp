@@ -6,7 +6,7 @@
 import Foundation
 
 /// Represents the SIP registration state, abstracting the SDK's internal RegistratorStateType.
-enum RegistrationStatus {
+enum RegistrationStatus: Equatable {
     case unregistered
     case registering
     case registered

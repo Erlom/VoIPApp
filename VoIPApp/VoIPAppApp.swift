@@ -2,16 +2,27 @@
 //  VoIPAppApp.swift
 //  VoIPApp
 //
-//  Created by Stefan Vojtko on 06.10.2026.
-//
 
 import SwiftUI
 
 @main
 struct VoIPAppApp: App {
+
+    @State private var softphoneService = SoftphoneService(
+        config: AppConfiguration(
+            sip: SIPConfiguration(
+                username: "3100",
+                password: "misscom",
+                server: "pbx.acrobits.cz"
+            ),
+            licenseKey: "kvotvlf5jgcsejqkc8bji3d90p"
+        )
+    )
+
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(softphoneService)
         }
     }
 }

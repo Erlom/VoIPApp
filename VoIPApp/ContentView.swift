@@ -2,23 +2,24 @@
 //  ContentView.swift
 //  VoIPApp
 //
-//  Created by Stefan Vojtko on 06.10.2026.
-//
 
 import SwiftUI
 
 struct ContentView: View {
+
+    @Environment(SoftphoneService.self) private var softphoneService
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        VStack(spacing: 16) {
+            if let error = softphoneService.initializationError {
+                Text("SDK init failed: \(error.localizedDescription)")
+                    .foregroundStyle(.red)
+                    .multilineTextAlignment(.center)
+            } else {
+                Text("Registration: \(softphoneService.registrationStatus.label)")
+                    .font(.headline)
+            }
         }
         .padding()
     }
-}
-
-#Preview {
-    ContentView()
 }
