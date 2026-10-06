@@ -73,21 +73,12 @@ struct DialerView: View {
         HStack(spacing: 20) {
             Color.clear.frame(width: 80, height: 80)
 
-            Button {
-                // TODO: handle call
-            } label: {
-                Circle()
-                    .fill(canCall ? .green : Color(.systemGray3))
-                    .frame(width: 72, height: 72)
-                    .overlay {
-                        Image(systemName: "phone.fill")
-                            .font(.title2)
-                            .foregroundStyle(.white)
-                    }
-            }
-            .buttonStyle(DialerKeyButtonStyle())
+            CircleIconButton(
+                color: canCall ? .green : Color(.systemGray3),
+                systemImage: "phone.fill",
+                action: { softphoneService.call(number: dialString) }
+            )
             .disabled(!canCall)
-            .frame(width: 80, height: 80)
 
             Button {
                 guard !dialString.isEmpty else { return }

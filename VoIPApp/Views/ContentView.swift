@@ -21,6 +21,12 @@ struct ContentView: View {
                     SettingsView(settings: appSettings)
                 }
             }
+            .fullScreenCover(isPresented: Binding(
+                get: { softphoneService.activeCallInfo != nil },
+                set: { _ in }
+            )) {
+                CallView()
+            }
             .transition(.opacity)
 
         case .failed(let reason):

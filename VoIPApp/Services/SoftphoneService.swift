@@ -75,6 +75,28 @@ final class SoftphoneService: NSObject {
         registration?.saveAccount(xml)
         registration?.updateAll()
     }
+
+    // MARK: - Call management
+
+    func call(number: String) {
+        let uri = "sip:\(number)@\(config.sip.server)"
+        let event = SoftphoneCallEvent.create(withAccountId: "sip", uri: uri)
+        let stream = SoftphoneEventStream.load(SoftphoneStreamQuery.legacyCallHistoryStreamKey())
+            ?? SoftphoneEventStream.generate()
+        event.setStream(stream)
+
+        if let transients = event.transients {
+            transients.set("voiceCall", forKey: "dialAction")
+            event.transients = transients
+        }
+
+        SoftphoneBridge.instance().events()?.post(event)
+    }
+
+    func hangUp() {
+        guard let call = activeSDKCall else { return }
+        SoftphoneBridge.instance().calls()?.hangup(call)
+    }
 }
 
 // MARK: - SoftphoneDelegateBridge
@@ -102,9 +124,12 @@ extension SoftphoneService: SoftphoneDelegateBridge {
             switch state {
             case CallState_Trying, CallState_Ringing:
                 self.activeSDKCall = call
+                let remoteUser = call.getRemoteUser(index: 0)
+                let rawUri = remoteUser?.genericUri ?? ""
+                let number = rawUri.hasPrefix("rx:") ? String(rawUri.dropFirst(3)) : rawUri
                 self.activeCallInfo = CallInfo(
-                    displayName: call.getRemoteUser(index: 0)?.displayName ?? "",
-                    number: call.getRemoteUser(index: 0)?.genericUri ?? "",
+                    displayName: remoteUser?.displayName ?? "",
+                    number: number,
                     connectedAt: nil,
                     callState: state == CallState_Ringing ? .ringing : .connecting
                 )
@@ -115,7 +140,7 @@ extension SoftphoneService: SoftphoneDelegateBridge {
                     self.activeCallInfo = CallInfo(
                         displayName: info.displayName,
                         number: info.number,
-                        connectedAt: Date(),
+                        connectedAt: call.timeEstablishedDate,
                         callState: .active
                     )
                 }
