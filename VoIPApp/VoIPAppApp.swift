@@ -18,11 +18,13 @@ struct VoIPAppApp: App {
             licenseKey: "kvotvlf5jgcsejqkc8bji3d90p"
         )
     )
+    @State private var appSettings = AppSettings()
 
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environment(softphoneService)
+                .environment(appSettings)
         }
     }
 }
