@@ -27,6 +27,7 @@ final class SoftphoneService: NSObject {
     init(config: AppConfiguration) {
         self.config = config
         super.init()
+        guard ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil else { return }
         do {
             try initializeSDK()
         } catch {
