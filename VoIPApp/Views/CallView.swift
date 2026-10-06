@@ -62,13 +62,12 @@ struct CallView: View {
             .padding(.top, 4)
     }
 
-    @ViewBuilder
     private var durationDisplay: some View {
-        if info?.callState == .active, let start = info?.connectedAt {
-            Text(start, style: .timer)
-                .font(.system(.title2, design: .monospaced))
-                .foregroundStyle(.secondary)
-        }
+        let start = info?.connectedAt ?? Date()
+        return Text(start, style: .timer)
+            .font(.system(.title2, design: .monospaced))
+            .foregroundStyle(.secondary)
+            .opacity(info?.callState == .active ? 1 : 0)
     }
 
     private var hangUpButton: some View {
