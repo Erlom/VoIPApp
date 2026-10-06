@@ -13,17 +13,28 @@ struct CircleButton<Content: View>: View {
     var longPressAction: (() -> Void)? = nil
     @ViewBuilder let content: () -> Content
 
+    @State private var longPressConsumed = false
+
     var body: some View {
-        Button(action: action) {
+        Button {
+            if longPressConsumed {
+                longPressConsumed = false
+            } else {
+                action()
+            }
+        } label: {
             Circle()
                 .fill(color)
                 .frame(width: size, height: size)
                 .overlay { content() }
         }
-        .buttonStyle(CircleButtonStyle())
+        .buttonStyle(CircleButtonStyle(suppressScale: longPressConsumed))
         .simultaneousGesture(
             LongPressGesture(minimumDuration: 0.5)
-                .onEnded { _ in longPressAction?() }
+                .onEnded { _ in
+                    longPressConsumed = true
+                    longPressAction?()
+                }
         )
     }
 }
@@ -45,9 +56,12 @@ struct CircleIconButton: View {
 }
 
 private struct CircleButtonStyle: ButtonStyle {
+    var suppressScale: Bool = false
+
     func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .scaleEffect(configuration.isPressed ? 0.92 : 1.0)
-            .animation(.easeOut(duration: 0.08), value: configuration.isPressed)
+        let scaled = configuration.isPressed && !suppressScale
+        return configuration.label
+            .scaleEffect(scaled ? 0.92 : 1.0)
+            .animation(.easeOut(duration: 0.08), value: scaled)
     }
 }
