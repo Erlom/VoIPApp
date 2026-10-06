@@ -14,6 +14,9 @@ struct ContentView: View {
         switch softphoneService.registrationStatus {
         case .registered:
             TabView {
+                Tab("Dialer", systemImage: "phone.fill") {
+                    DialerView()
+                }
                 Tab("Settings", systemImage: "gear") {
                     SettingsView(settings: appSettings)
                 }
